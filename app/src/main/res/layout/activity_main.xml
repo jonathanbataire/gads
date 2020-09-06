@@ -18,8 +18,8 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:background="@color/colorPrimary"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
@@ -29,6 +29,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/toolbar"
             app:tabSelectedTextColor="@color/colorAccent"
             app:tabIndicatorColor="@color/colorAccent"/>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
