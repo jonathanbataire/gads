@@ -32,6 +32,7 @@ public class SubmitActivity extends AppCompatActivity {
     private String strEmail;
     private String LastName;
     private String strGitLink;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,8 @@ public class SubmitActivity extends AppCompatActivity {
         email = findViewById(R.id.editTextEmailAddress);
         gitLink = findViewById(R.id.editTextgithub);
         mAPIService = ApiUtils.getAPIService();
+
+        //builder = new AlertDialog.Builder(SubmitActivity.this);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,9 +61,29 @@ public class SubmitActivity extends AppCompatActivity {
                 LastName = lName.getText().toString().trim();
                 strEmail = email.getText().toString().trim();
                 strGitLink = gitLink.getText().toString().trim();
-                //showAlertDialog("Are you Sure",true);
 
+                builder = new AlertDialog.Builder(SubmitActivity.this);
+                builder.setTitle(Html.fromHtml("<font color='#000000'> Are You Sure? </font>"));
+                builder.setNegativeButton(Html.fromHtml("<font color='#ffa333'>No</font>"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.dismiss();
+                    }
+                });
 
+                builder.setPositiveButton(Html.fromHtml("<font color='#ffa333'>Yes</font>"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        try {
+                            dialog.dismiss();
+                            sendPost();
+                            //dialog.dismiss();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
 
                 //Toast.makeText(getApplicationContext(),FirstName + LastName + strEmail + strGitLink,Toast.LENGTH_LONG).show();
 
@@ -77,55 +100,37 @@ public class SubmitActivity extends AppCompatActivity {
             public void onResponse(Call<String> call, Response<String> response) {
 
                 //Toast.makeText(getApplicationContext(), "this "+response, Toast.LENGTH_SHORT).show();
-                //showAlertDialog("Successful!!!!",false);
+                Drawable icon = AppCompatResources.getDrawable(SubmitActivity.this, R.drawable.ic_baseline_check_circle_24);
+                DrawableCompat.setTint(icon, Color.GREEN);
+                showOkDialog(icon, "Submitted Successfully");
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 
                 //Toast.makeText(getApplicationContext(), "Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
-                //showAlertDialog("Failure...",false);
+                Drawable icon = AppCompatResources.getDrawable(SubmitActivity.this, R.drawable.ic_baseline_warning_24);
+                DrawableCompat.setTint(icon, Color.RED);
+                showOkDialog(icon, "Failed to Submit...");
 
             }
         });
 
     }
 
-    public void showAlertDialog(String msg,Boolean buttons,int flag){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        /*Drawable icon;
-        icon = AppCompatResources.getDrawable(this, R.drawable.ic_baseline_check_circle_24);
-        DrawableCompat.setTint(icon, Color.GREEN);
-        if(flag == 1){
-
-        }else {
-            icon = AppCompatResources.getDrawable(this, R.drawable.ic_baseline_warning_24);
-            DrawableCompat.setTint(icon, Color.RED);
-
-        }*/
-
-        builder.setTitle(Html.fromHtml("<font color='#000000'>"+msg+"</font>"));
-        if(buttons){
-            builder.setNegativeButton(Html.fromHtml("<font color='#ffa333'>No</font>"), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg1) {
-                    dialog.dismiss();
-                }
-            });
-        }
+    public  void showOkDialog(Drawable icon, String msg){
+        builder = new AlertDialog.Builder(SubmitActivity.this);
+        builder.setTitle(Html.fromHtml("<font color='#000000'> "+msg+" </font>"));
+        builder.setIcon(icon);
+        builder.setCancelable(true);
         builder.setPositiveButton(Html.fromHtml("<font color='#ffa333'>OK</font>"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int arg1) {
-                try {
-                    sendPost();
-                } catch (IOException e) {
-                        e.printStackTrace();
-                }
+                dialog.dismiss();
             }
         });
-
-        builder.create();
-        builder.show();
+        AlertDialog alert = builder.create();
+        alert.show();
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
