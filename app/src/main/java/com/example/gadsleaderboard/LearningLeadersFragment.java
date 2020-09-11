@@ -12,10 +12,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,6 +34,7 @@ public class LearningLeadersFragment extends Fragment {
 
     private PerformanceRecyclerAdapter adapter;
     public static final String BASE_URL = "https://gadsapi.herokuapp.com/";
+    private ArrayList<Leader> data;
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,14 +44,6 @@ public class LearningLeadersFragment extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        ArrayList<String> Names = new ArrayList<>();
-        Names.add("Horse");
-        Names.add("Cow");
-        Names.add("meat");
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new PerformanceRecyclerAdapter(getActivity(), Names);
-        recyclerView.setAdapter(adapter);
         getData(view);
     }
 
@@ -60,7 +58,20 @@ public class LearningLeadersFragment extends Fragment {
         jsonCall.enqueue(new Callback<JsonArray>() {
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
-                Toast.makeText(view.getContext(),response.body().toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(view.getContext(),response.body().toString(), Toast.LENGTH_LONG).show();
+                JsonArray jsonResponse = response.body();
+                //assert jsonResponse != null;
+                Gson gson = new Gson();
+
+                Type userListType = new TypeToken<ArrayList<Leader>>(){}.getType();
+
+                ArrayList<Leader> userArray = gson.fromJson(jsonResponse, userListType);
+                //data = new ArrayList<>(Arrays.asList(userArray));
+
+                RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                adapter = new PerformanceRecyclerAdapter(getActivity(), userArray);
+                recyclerView.setAdapter(adapter);
 
             }
 
